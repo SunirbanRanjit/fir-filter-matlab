@@ -1,8 +1,12 @@
 close all;
 clear;
 
+filename = 'samplefile.wav';
+[x, fs_orig] = audioread(filename);
+x = x(:,1);                 % Take one channel only (if stereo)
+            
 %% Define filter specifications
-fs = 48000;      % Sampling frequency in Hz
+fs = fs_orig;      % Sampling frequency in Hz
 N = 300;         % Filter order
 notch_freq = 5000; % Notch frequency in Hz
 stop_atten = 40; % Stopband attenuation in dB
@@ -21,11 +25,6 @@ b_win = b .* win;
 figure;
 freqz(b);
 
-%% Apply filter to sample file
-filename = 'samplefile.wav'; % Replace with your own audio file
-[x, fs_orig] = audioread(filename);
-x = x(:,1);                 % Take one channel only (if stereo)
-
 %% Compute power spectral density
 window = hann(1024); % Choose window function
 noverlap = 512; % Choose overlap between windows
@@ -42,7 +41,7 @@ noise = A*sin(2*pi*f*t);
 x = x + noise';
 [Pxx, fx] = pwelch(x, window, noverlap, nfft, fs_orig);
 
-% Apply filter
+%% Apply filter to sample file
 y = filter(b, 1, x);
 
 % Plot original and filtered signals
